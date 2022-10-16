@@ -13,6 +13,7 @@ import (
 )
 
 //!+sleep
+// 
 var period = flag.Duration("period", 1*time.Second, "sleep period")
 
 func main() {

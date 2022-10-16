@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+
 )
 
 func main() {
@@ -20,6 +21,8 @@ func main() {
 //!+handler
 // handler echoes the HTTP request.
 func handler(w http.ResponseWriter, r *http.Request) {
+
+		
 	fmt.Fprintf(w, "%s %s %s\n", r.Method, r.URL, r.Proto)
 	for k, v := range r.Header {
 		fmt.Fprintf(w, "Header[%q] = %q\n", k, v)

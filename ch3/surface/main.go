@@ -9,7 +9,14 @@ package main
 
 import (
 	"fmt"
+	"math/rand"
+	"time"
+
+	"io"
+	"log"
 	"math"
+	"net/http"
+	"os"
 )
 
 const (
@@ -22,9 +29,8 @@ const (
 )
 
 var sin30, cos30 = math.Sin(angle), math.Cos(angle) // sin(30°), cos(30°)
-
-func main() {
-	fmt.Printf("<svg xmlns='http://www.w3.org/2000/svg' "+
+func generateSVG(out io.Writer) {
+	fmt.Fprintf(out, "<svg xmlns='http://www.w3.org/2000/svg' "+
 		"style='stroke: grey; fill: white; stroke-width: 0.7' "+
 		"width='%d' height='%d'>", width, height)
 	for i := 0; i < cells; i++ {
@@ -33,11 +39,41 @@ func main() {
 			bx, by := corner(i, j)
 			cx, cy := corner(i, j+1)
 			dx, dy := corner(i+1, j+1)
-			fmt.Printf("<polygon points='%g,%g %g,%g %g,%g %g,%g'/>\n",
+			if math.IsInf(ax, 0) || math.IsInf(ay, 0) || math.IsInf(bx, 0) || math.IsInf(by, 0) || math.IsInf(cx, 0) || math.IsInf(cy, 0) || math.IsInf(dx, 0) || math.IsInf(dy, 0) {
+				continue
+			}
+			fmt.Fprintf(out, "<polygon points='%g,%g %g,%g %g,%g %g,%g'/>\n",
 				ax, ay, bx, by, cx, cy, dx, dy)
 		}
 	}
-	fmt.Println("</svg>")
+	fmt.Fprintf(out, "</svg>")
+}
+
+func main() {
+	//!-main
+	// The sequence of images is deterministic unless we seed
+	// the pseudo-random number generator using the current time.
+	// Thanks to Randall McPherson for pointing out the omission.
+	rand.Seed(time.Now().UTC().UnixNano())
+
+	if len(os.Args) > 1 && os.Args[1] == "web" {
+		//!+http
+		// handler := func(w http.ResponseWriter, r *http.Request) {
+		// 	w.Header().Set("Content-Type", "image/svg+xml")
+		// 	generateSVG(w)
+		// }
+		// http.HandleFunc("/", handler)
+		http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("Content-Type", "image/svg+xml")
+			generateSVG(w)
+		})
+
+		//!-http
+		log.Fatal(http.ListenAndServe("localhost:8001", nil))
+
+	}
+	// !+main
+	// lissajous(os.Stdout)
 }
 
 func corner(i, j int) (float64, float64) {

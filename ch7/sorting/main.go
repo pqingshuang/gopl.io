@@ -4,7 +4,7 @@
 // See page 187.
 
 // Sorting sorts a music playlist into a variety of orders.
-package main
+package sorting
 
 import (
 	"fmt"
@@ -30,12 +30,40 @@ var tracks = []*Track{
 	{"Ready 2 Go", "Martin Solveig", "Smash", 2011, length("4m24s")},
 }
 
+func Length(s string) time.Duration {
+	d, err := time.ParseDuration(s)
+	if err != nil {
+		panic(s)
+	}
+	return d
+}
 func length(s string) time.Duration {
 	d, err := time.ParseDuration(s)
 	if err != nil {
 		panic(s)
 	}
 	return d
+}
+func MultiSort(tracks []*Track, columns []string) sort.Interface {
+	return customSort{
+		tracks,
+		func(x, y *Track) bool {
+			for i := len(columns) - 1; i >= 0; i-- {
+				if columns[i] == "Title" && x.Title != y.Title {
+					return x.Title < y.Title
+				} else if columns[i] == "Artist" && x.Artist != y.Artist {
+					return x.Artist < y.Artist
+				} else if columns[i] == "Album" && x.Album != y.Album {
+					return x.Album < y.Album
+				} else if columns[i] == "Year" && x.Year != y.Year {
+					return x.Year < y.Year
+				} else if columns[i] == "Length" && x.Length != y.Length {
+					return x.Length < y.Length
+				}
+			}
+			return true
+		},
+	}
 }
 
 //!-main
@@ -72,36 +100,36 @@ func (x byYear) Swap(i, j int)      { x[i], x[j] = x[j], x[i] }
 
 //!-yearcode
 
-func main() {
-	fmt.Println("byArtist:")
-	sort.Sort(byArtist(tracks))
-	printTracks(tracks)
+// func main() {
+// 	fmt.Println("byArtist:")
+// 	sort.Sort(byArtist(tracks))
+// 	printTracks(tracks)
 
-	fmt.Println("\nReverse(byArtist):")
-	sort.Sort(sort.Reverse(byArtist(tracks)))
-	printTracks(tracks)
+// 	fmt.Println("\nReverse(byArtist):")
+// 	sort.Sort(sort.Reverse(byArtist(tracks)))
+// 	printTracks(tracks)
 
-	fmt.Println("\nbyYear:")
-	sort.Sort(byYear(tracks))
-	printTracks(tracks)
+// 	fmt.Println("\nbyYear:")
+// 	sort.Sort(byYear(tracks))
+// 	printTracks(tracks)
 
-	fmt.Println("\nCustom:")
-	//!+customcall
-	sort.Sort(customSort{tracks, func(x, y *Track) bool {
-		if x.Title != y.Title {
-			return x.Title < y.Title
-		}
-		if x.Year != y.Year {
-			return x.Year < y.Year
-		}
-		if x.Length != y.Length {
-			return x.Length < y.Length
-		}
-		return false
-	}})
-	//!-customcall
-	printTracks(tracks)
-}
+// 	fmt.Println("\nCustom:")
+// 	//!+customcall
+// 	sort.Sort(customSort{tracks, func(x, y *Track) bool {
+// 		if x.Title != y.Title {
+// 			return x.Title < y.Title
+// 		}
+// 		if x.Year != y.Year {
+// 			return x.Year < y.Year
+// 		}
+// 		if x.Length != y.Length {
+// 			return x.Length < y.Length
+// 		}
+// 		return false
+// 	}})
+// 	//!-customcall
+// 	printTracks(tracks)
+// }
 
 /*
 //!+artistoutput

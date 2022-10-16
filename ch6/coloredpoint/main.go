@@ -50,7 +50,7 @@ func main() {
 /*
 //!+error
 	p.Distance(q) // compile error: cannot use q (ColoredPoint) as Point
-//!-error
+//!- 
 */
 
 func init() {

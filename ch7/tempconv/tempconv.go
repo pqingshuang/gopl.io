@@ -16,7 +16,7 @@ type Fahrenheit float64
 
 func CToF(c Celsius) Fahrenheit { return Fahrenheit(c*9.0/5.0 + 32.0) }
 func FToC(f Fahrenheit) Celsius { return Celsius((f - 32.0) * 5.0 / 9.0) }
-
+// This is a method to Celsius, Celsius.string()
 func (c Celsius) String() string { return fmt.Sprintf("%g°C", c) }
 
 /*
@@ -38,6 +38,7 @@ type celsiusFlag struct{ Celsius }
 func (f *celsiusFlag) Set(s string) error {
 	var unit string
 	var value float64
+	// this call parses a floating-point number and string from input s
 	fmt.Sscanf(s, "%f%s", &value, &unit) // no error check needed
 	switch unit {
 	case "C", "°C":
@@ -59,6 +60,8 @@ func (f *celsiusFlag) Set(s string) error {
 // The flag argument must have a quantity and a unit, e.g., "100C".
 func CelsiusFlag(name string, value Celsius, usage string) *Celsius {
 	f := celsiusFlag{value}
+	//flag库中定义了一个FlagSet类型的全局变量CommandLine专门用于解析命令行选项
+	//"pkg"."variable"可以获取变量
 	flag.CommandLine.Var(&f, name, usage)
 	return &f.Celsius
 }

@@ -58,3 +58,4 @@ func reverse(s []int) {
 }
 
 //!-rev
+4
